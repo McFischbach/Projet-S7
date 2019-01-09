@@ -15,12 +15,13 @@ void Receive_Char_Config_LPUART(){
 	//Disable LPUART in order to set the registers
 	LPUART1->CR1 &= ~(USART_CR1_UE_Msk);
 
-	//Define word lenght
+	//Define word length
 	LPUART1->CR1 &= ~(USART_CR1_M1_Msk);
 	LPUART1->CR1 |= (0x00 << USART_CR1_M1_Pos);
 
 	LPUART1->CR1 &= ~(USART_CR1_M0_Msk);
 	LPUART1->CR1 |= (0x00 << USART_CR1_M0_Pos);
+
 
 	//No parity bit
 	LPUART1->CR1 &= ~(USART_CR1_PCE_Msk);
@@ -49,7 +50,7 @@ void Transmit_Char_Config_LPUART(){
 	//Disable LPUART in order to set the registers
 	LPUART1->CR1 &= ~(USART_CR1_UE_Msk);
 
-	//Define word lenght
+	//Define word length
 	LPUART1->CR1 &= ~(USART_CR1_M1_Msk);
 	LPUART1->CR1 |= (0x01 << USART_CR1_M1_Pos);
 
@@ -71,7 +72,7 @@ void Transmit_Char_Config_LPUART(){
 	LPUART1->CR1 |= USART_CR1_UE;
 
 	//Set the TE bit to enable the transmitter to
-	//send an idle frame for 1st transmition
+	//Send an idle frame for 1st transmit
 	LPUART1->CR1 |= USART_CR1_TE;
 
 	// Use PA2 to transmit

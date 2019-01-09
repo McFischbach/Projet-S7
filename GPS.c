@@ -7,7 +7,7 @@
 
 #include "GPS.h"
 
-void ParseurGPS(void* parameters){
+void ParseurGPS(uint8_t* rx_dma_buffer, uint8_t dma_buffer_id){ // dma_buffer_id vaut 0 ou 1 selon si on est sur la 1ere ou 2eme moitié de buffer
 
 	uint8_t bufIndex;
 	uint8_t nmea_byte;
@@ -37,7 +37,8 @@ void ParseurGPS(void* parameters){
 	NVIC_SetPriority(DMA1_Channel2_3_IRQn, 17);
 	NVIC_EnableIRQ(DMA1_Channel2_3_IRQn);
 
-	// Take the semaphore once to make sure it's empty
+	// If flag = 1 that mena swe have to treat the first buffer's half, if
+	// flag =2 -> sceond half
 
 
 	// Start GPS stream
@@ -46,7 +47,7 @@ void ParseurGPS(void* parameters){
 	while(1){
 
 		// Parse incomming NMEA buffer
-		// --------------------------
+		// ---------------------------
 
 		bufIndex = 0;
 
@@ -54,7 +55,7 @@ void ParseurGPS(void* parameters){
 		while(bufIndex < GPS_RX_HALFBUFFER_SIZE){
 
 			//load the sentence in nmea_byte, then we will slice it
-			nmea_byte = gps_rx_buffer[bufIndex + GPS_RX_HALFBUFFER_SIZE*dma_buffer_id];
+			nmea_byte = rx_dma_buffer[bufIndex + GPS_RX_HALFBUFFER_SIZE*dma_buffer_id];
 
 			switch(parser_state){
 
@@ -66,7 +67,7 @@ void ParseurGPS(void* parameters){
 
 					 // Start byte detected, initialization of the parser
 
-					for (i=0; i<128; i++){
+					for (i=0; i<GPS_RX_HALFBUFFER_SIZE; i++){
 
 						nmea_sentence[i] = 0;
 
@@ -93,7 +94,7 @@ void ParseurGPS(void* parameters){
 					local_CRC ^= nmea_byte; // XOR
 					++i;
 
-					if(i>256){ // Message probably too long
+					if(i>GPS_RX_BUFFER_SIZE){ // Message probably too long
 
 						parser_state = 0;
 						++error_count;
@@ -273,6 +274,9 @@ void ParseurGPS(void* parameters){
 					g_latitude_dec =  	(uint32_t) latitude_decc;
 					g_longitude_int = 	(uint8_t)  longitude_int;
 					g_longitude_dec = 	(uint32_t) longitude_dec;
+					g_jour = 				(uint8_t)	jour;
+					g_mois = 				(uint8_t)	mois;
+					g_annee = 				(uint8_t)	annee;
 
 
 			}
